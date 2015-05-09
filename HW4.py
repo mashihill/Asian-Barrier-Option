@@ -49,8 +49,8 @@ def BOPF(data):
         logger.warning('l not found')
         if A < Average(0, j, i):
             return 0
-        else if A > A(k, j, i):
-            return k
+        elif (A > Average(k, j, i)):
+            return k-1
         else:
             logger.error('l error')
             return 0
