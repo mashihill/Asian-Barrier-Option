@@ -6,7 +6,7 @@ from math import *
 import scipy.stats
 import logging
 
-#logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -48,9 +48,11 @@ def BOPF(data):
         #raise ValueError
         logger.warning('l not found')
         if A < Average(0, j, i):
+            logger.warning('l return 0')
             return 0
         elif (A > Average(k, j, i)):
-            return k-1
+            logger.warning('l return k')
+            return k
         else:
             logger.error('l error')
             return 0
@@ -72,18 +74,19 @@ def BOPF(data):
                 l = findl(A_u, j+1, i)
                 try:
                     x = (A_u - Average(l+1, j+1, i)) / (Average(l, j+1, i) - Average(l+1, j+1, i))
+                    C_u = x * C[i][l] + (1-x) * C[i][l+1]
                 except:
                     x = 1
-                C_u = x * C[i][l] + (1-x) * C[i][l+1]
+                    C_u = C[i][l]
 
                 A_d = ((j+1) * a + S * u ** (j-i) * d ** (i+1)) / (j + 2)
                 l = findl(A_d, j+1, i+1)
                 try:
                     x = (A_d - Average(l+1, j+1, i+1)) / (Average(l, j+1, i+1) - Average(l+1, j+1, i+1))
+                    C_d = x * C[i+1][l] + (1-x) * C[i+1][l+1]
                 except:
                     x = 1
-                logger.debug('i= %s, l= %s', i, l)
-                C_d = x * C[i+1][l] + (1-x) * C[i+1][l+1]
+                    C_d = C[i+1][l]
                 D[m] = 0 if a >= H else ((p * C_u + (1-p) * C_d) / R)
             for num in range(k+1):
                 C[i][num] = D[num]
