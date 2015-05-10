@@ -45,17 +45,17 @@ def BOPF(data):
                 return l
         #raise ValueError
         logger.warning('l not found')
-        if A < Average(0, j, i):
+        if A <= Average(0, j, i):
             logger.warning('l return 0')
             return 0
-        elif (A > Average(k, j, i)):
+        elif (A >= Average(k, j, i)):
             logger.warning('l return k')
             return k
         else:
             logger.error('l error')
             return 0
 
-    C = [[max(0, Average(m, n, i) - X) * (Average(m, n, i) <= H) for m in range(k+1)] for i in range(n+1)]
+    C = [[max(0, Average(m, n, i) - X) * (Average(m, n, i) < H) for m in range(k+1)] for i in range(n+1)]
     logger.debug("C: %r", C)
     D = [None] * (k+1)
 
