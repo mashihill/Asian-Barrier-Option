@@ -5,9 +5,11 @@ from __future__ import division
 from math import *
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('logger')
 logger.setLevel(logging.WARNING)
-
+ch = logging.StreamHandler()
+ch.setLevel(logging.WARNING)
+logger.addHandler(ch)
 
 def BOPF(data):
 
@@ -38,11 +40,12 @@ def BOPF(data):
         return (((k - m) / k) * Amin(j, i) + (m / k) * Amax(j, i))
 
     def findl(A, j, i):
+        logger.debug('l not found')
         for l in range(k):
             if Average(l, j, i) <= A and A <= Average(l+1, j, i):
                 return l
         logger.warning('l not found')
-        if A <= Average(0, j, i):
+        if A < Average(0, j, i):
             logger.warning('l return 0')
             return 0
         elif (A >= Average(k, j, i)):
@@ -72,24 +75,21 @@ def BOPF(data):
                         x = (A_u - Average(l+1, j+1, i)) / (Average(l, j+1, i) - Average(l+1, j+1, i))
                         C_u = x * C[i][l] + (1-x) * C[i][l+1]
                     else:
-                        x = 1
                         C_u = C[i][l]
                 except:
-                    x = 1
                     C_u = C[i][l]
 
-                A_d = ((j+1) * a + S * u ** (j-i) * d ** (i+1)) / (j + 2)
+                A_d = ((j+1) * a + S * u ** (j-i) * d ** (i+1)) / (j+2)
                 l = findl(A_d, j+1, i+1)
                 try:
                     if l not in [0, k]:
                         x = (A_d - Average(l+1, j+1, i+1)) / (Average(l, j+1, i+1) - Average(l+1, j+1, i+1))
                         C_d = x * C[i+1][l] + (1-x) * C[i+1][l+1]
                     else:
-                        x = 1
                         C_d = C[i+1][l]
                 except:
-                    x = 1
                     C_d = C[i+1][l]
+
                 D[m] = 0 if a >= H else ((p * C_u + (1-p) * C_d) / R)
 
             C[i][:] = D[:]
