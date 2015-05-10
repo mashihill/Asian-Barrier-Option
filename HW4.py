@@ -4,6 +4,7 @@
 from __future__ import division
 from math import *
 import logging
+import numpy as np
 
 logger = logging.getLogger('logger')
 logger.setLevel(logging.WARNING)
@@ -41,28 +42,28 @@ def BOPF(data):
 
     def findl(A, j, i):
         logger.debug('l not found')
+        if A < Average(0, j, i):
+            logger.warning('l return 0')
+            return 0
+        if (A >= Average(k, j, i)):
+            logger.warning('l return k')
+            return k
         for l in range(k):
             if Average(l, j, i) <= A and A <= Average(l+1, j, i):
                 return l
         logger.warning('l not found')
-        if A < Average(0, j, i):
-            logger.warning('l return 0')
-            return 0
-        elif (A >= Average(k, j, i)):
-            logger.warning('l return k')
-            return k
-        else:
-            logger.error('l error')
-            return 0
+        return 0
 
     C = [[max(0, Average(m, n, i) - X) * (Average(m, n, i) < H) for m in xrange(k+1)] for i in xrange(n+1)]
+    C = np.array(C)
     logger.debug("C: %r", C)
     D = [None] * (k+1)
+    D = np.array(D)
 
     # Asian barrier option
-    for j in reversed(xrange(n)):
-        for i in xrange(j+1):
-            for m in xrange(k+1):
+    for j in reversed(range(n)):
+        for i in range(j+1):
+            for m in range(k+1):
                 logger.debug("loop j=%s, i=%s, m=%s", j, i, m)
                 a = Average(m, j, i)
                 A_u = ((j+1) * a + S * u ** (j+1-i) * d ** i) / (j+2)
@@ -109,4 +110,4 @@ if __name__ == '__main__':
         print "~~ end ~~"
     else:
         print 'This requires an input file.  Please select one from the data \
-               directory. (e.g. python HW2.py ./data)'
+               directory. (e.g. python HW4.py ./data)'
